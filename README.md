@@ -12,3 +12,6 @@
 
 # BUILD
     go build
+
+# CREATE BRANCH
+    git branch -b name_your_branch

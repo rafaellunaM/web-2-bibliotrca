@@ -2,7 +2,11 @@ module library
 
 go 1.22.6
 
-require github.com/lib/pq v1.10.9
+require (
+	github.com/joho/godotenv v1.5.1
+	gorm.io/driver/postgres v1.5.9
+	gorm.io/gorm v1.25.11
+)
 
 require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
@@ -14,6 +18,4 @@ require (
 	golang.org/x/crypto v0.26.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/text v0.17.0 // indirect
-	gorm.io/driver/postgres v1.5.9 // indirect
-	gorm.io/gorm v1.25.11 // indirect
 )

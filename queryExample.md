@@ -1,7 +1,9 @@
 # Listar Empréstimos com Informações do Cliente e Livro:
     SELECT
         loan.loanId,
+        loan.cpf,
         client.name AS client_name,
+        client.name,
         book.title AS book_title,
         loan.dueDate,
         loan.returnDate
@@ -37,3 +39,20 @@
 
 # Contar o Número de Empréstimos Pendentes:
     SELECT COUNT(*) FROM loan WHERE returnDate IS NULL;
+
+
+
+# QUERY EXAMPLE USING GORM
+
+    Librarian == Admin == Client == Book
+	err = db.AutoMigrate(&tables.Book{})
+	checErr(err)
+
+	var book tables.Book
+	result := db.First(&book)
+	if result.Error != nil {
+		fmt.Println("Error:", result.Error)
+	} else {
+		fmt.Printf("Book: %+v\n", book)
+	}
+

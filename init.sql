@@ -27,6 +27,7 @@ CREATE TABLE Book (
     title varchar(255) NOT NULL,
     author varchar(255),
     category varchar(255),
+    price DECIMAL(10, 2),
     availability boolean DEFAULT FALSE
 );
 
@@ -63,10 +64,10 @@ INSERT INTO Client (cpf, name, email, password, phoneNumber) VALUES
 ('56789012345', 'Fernanda Lima', 'fernanda.lima@example.com', 'senha202', '11943210987'),
 ('67890123456', 'Pedro Santos', 'pedro.santos@example.com', 'senha303', '11932109876');
 
-INSERT INTO Book (bookId, title, author, category, availability) VALUES
-('B001', 'O Senhor dos Anéis', 'J.R.R. Tolkien', 'Fantasia', TRUE),
-('B002', '1984', 'George Orwell', 'Distopia', TRUE),
-('B003', 'O Pequeno Príncipe', 'Antoine de Saint-Exupéry', 'Infantil', FALSE);
+INSERT INTO Book (bookId, title, author, category, price, availability) VALUES
+('B001', 'O Senhor dos Anéis', 'J.R.R. Tolkien', 'Fantasia', 10.0, TRUE),
+('B002', '1984', 'George Orwell', 'Distopia', 11.0, TRUE),
+('B003', 'O Pequeno Príncipe', 'Antoine de Saint-Exupéry', 'Infantil', 12.0, FALSE);
 
 INSERT INTO Loan (loanId, cpf, bookId, dueDate, returnDate) VALUES
 ('L001', '56789012345', 'B001', '2024-09-01', NULL),

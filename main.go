@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
-	"library/tables"
+	crud "library/crud"
+	"log"
+	"net/http"
 
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"github.com/gorilla/mux"
 )
 
 var err error
@@ -17,25 +17,9 @@ func checErr(err error) {
 }
 
 func main() {
-	dsn := "host=localhost user=library password=library dbname=library port=5432 sslmode=disable TimeZone=America/Recife"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	checErr(err)
+	router := mux.NewRouter()
+	router.HandleFunc("/books", crud.GetBooks).Methods("GET")
+	router.HandleFunc("/books", crud.AddBook).Methods("POST")
 
-	err = db.AutoMigrate(&tables.Librarian{})
-	checErr(err)
-
-	if err != nil {
-		panic("connection fail")
-	}
-
-	db.AutoMigrate(&tables.Librarian{})
-
-	var librarian tables.Librarian
-
-	result := db.First(&librarian)
-	if result.Error != nil {
-		fmt.Println("Error:", result.Error)
-	} else {
-		fmt.Printf("Librarian: %+v\n", librarian)
-	}
+	log.Fatal(http.ListenAndServe(":8000", router))
 }

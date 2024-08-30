@@ -1,17 +1,16 @@
-# web-2-biblioteca
+# library_api web-2
 
-# START DB POSTGRES IN BACKGROUND
+# START DB and API IN BACKGROUND
     docker-compose up -d
 
-# STOP DB POSTGRES
+# STOP DB and API
     docker-compose down
 
 # START API
-    go mod tidy   
+    go mod tidy  
+    cd cmd/ 
     go run main.go 
 
-# BUILD
-    go build
-
-# CREATE BRANCH
-    git branch -b name_your_branch
+# Build project
+    docker build -f Dockerfile -t library_api:1.0 .
+    docker run -p 8080:8080 library_api:1.0

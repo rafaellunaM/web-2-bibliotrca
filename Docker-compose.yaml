@@ -12,3 +12,10 @@ services:
       - "5432:5432"
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  main_api:
+    depends_on:
+      - db
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: always

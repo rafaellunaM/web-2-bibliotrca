@@ -9,6 +9,8 @@ import (
 	"library/pkg/db"
 	"library/pkg/handlers"
 
+	"github.com/rs/cors"
+
 	"github.com/gorilla/mux"
 )
 
@@ -26,7 +28,14 @@ func handleRequests(DB *sql.DB) {
 	myRouter.HandleFunc("/books", h.AddBook).Methods(http.MethodPost)
 	myRouter.HandleFunc("/books/{bookid}", h.UpdatedBook).Methods(http.MethodPut)
 	myRouter.HandleFunc("/books/{bookid}", h.DeleteBook).Methods(http.MethodDelete)
-	log.Fatal(http.ListenAndServe(":8080", myRouter))
+
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost:3000"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders: []string{"Content-Type"},
+	})
+	handler := corsHandler.Handler(myRouter)
+	log.Fatal(http.ListenAndServe(":8080", handler))
 	fmt.Println("Listening in port 8080")
 }
 

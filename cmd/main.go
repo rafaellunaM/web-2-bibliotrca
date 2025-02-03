@@ -30,7 +30,7 @@ func handleRequests(DB *sql.DB) {
 	myRouter.HandleFunc("/books/{bookid}", h.DeleteBook).Methods(http.MethodDelete)
 
 	corsHandler := cors.New(cors.Options{
-		AllowedOrigins: []string{"http://localhost:3000"},
+		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders: []string{"Content-Type"},
 	})

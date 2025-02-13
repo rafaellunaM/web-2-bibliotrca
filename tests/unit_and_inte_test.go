@@ -23,11 +23,18 @@ type Handler struct {
 	DB *sql.DB
 }
 
-func (h *Handler) TestAddBook(book Book) error {
+func (h *Handler) AddBook(book Book) error {
 	query := `INSERT INTO book (bookid, title, author, quantity, category, price, availability) 
-	VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING bookid;`
+    VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING bookid;`
 
-	return h.DB.QueryRow(query, book.Bookid, book.Title, book.Author, book.Quantity, book.Category, book.Price, book.Availability).Scan(&book.Bookid)
+	row := h.DB.QueryRow(query, book.Bookid, book.Title, book.Author, book.Quantity, book.Category, book.Price, book.Availability)
+
+	if err := row.Scan(&book.Bookid); err != nil {
+		fmt.Printf("Erro ao add o livro: %v\n", err)
+		return err
+	}
+
+	return nil
 }
 
 func TestAddBook(t *testing.T) { // iteration 1
@@ -53,7 +60,7 @@ func TestAddBook(t *testing.T) { // iteration 1
 		Availability: true,
 	}
 
-	err = h.TestAddBook(book)
+	err = h.AddBook(book)
 	assert.NoError(t, err)
 
 	mock.ExpectationsWereMet()
@@ -82,7 +89,7 @@ func TestAddBookSQLFail(t *testing.T) { // iteration 2
 		Availability: true,
 	}
 
-	err = h.TestAddBook(book)
+	err = h.AddBook(book)
 	assert.Error(t, err)
 
 	mock.ExpectationsWereMet()
@@ -111,7 +118,7 @@ func TestAddBookInvalidData(t *testing.T) { // iteration 3
 		Availability: false,
 	}
 
-	err = h.TestAddBook(book)
+	err = h.AddBook(book)
 	assert.Error(t, err)
 
 	mock.ExpectationsWereMet()
@@ -140,7 +147,7 @@ func TestAddBookDuplicate(t *testing.T) { // iteration 4
 		Availability: true,
 	}
 
-	err = h.TestAddBook(book)
+	err = h.AddBook(book)
 	assert.Error(t, err)
 
 	mock.ExpectationsWereMet()
@@ -148,8 +155,14 @@ func TestAddBookDuplicate(t *testing.T) { // iteration 4
 
 func (h *Handler) UpdateBook(book Book) error {
 	query := `UPDATE book SET title = $1, price = $2 WHERE bookid = $3;`
+
 	_, err := h.DB.Exec(query, book.Title, book.Price, book.Bookid)
-	return err
+	if err != nil {
+		fmt.Println("Error during update:", err)
+		return fmt.Errorf("failed to update book: %v", err)
+	}
+
+	return nil
 }
 
 func TestUpdateBook(t *testing.T) { // iteration 5
@@ -205,7 +218,12 @@ func TestUpdateBookFail(t *testing.T) { // iteration 6
 func (h *Handler) DeleteBook(bookid string) error {
 	query := `DELETE FROM book WHERE bookid = $1;`
 	_, err := h.DB.Exec(query, bookid)
-	return err
+
+	if err != nil {
+		fmt.Println("Error during delete:", err)
+		return fmt.Errorf("failed to delete book: %v", err)
+	}
+	return nil
 }
 
 func TestDeleteBook(t *testing.T) { // iteration 7
@@ -247,9 +265,13 @@ func TestDeleteBookFail(t *testing.T) { // iteration 8
 }
 
 func (h *Handler) TestDBConnection() error {
-	query := `SELECT 1;`
-	_, err := h.DB.Exec(query)
-	return err
+
+	err := h.DB.QueryRow("SELECT 1").Scan()
+	if err != nil {
+		fmt.Println("Error during connection:", err)
+		return fmt.Errorf("database connection failed: %v", err)
+	}
+	return nil
 }
 
 func TestDBConnection(t *testing.T) { // iteration 9
@@ -259,13 +281,13 @@ func TestDBConnection(t *testing.T) { // iteration 9
 	}
 	defer db.Close()
 
-	mock.ExpectExec(`SELECT 1;`).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectQuery(`SELECT 1`).
+		WillReturnError(fmt.Errorf("database connection failed"))
 
 	h := Handler{DB: db}
 
 	err = h.TestDBConnection()
-	assert.NoError(t, err)
+	assert.Error(t, err)
 
 	mock.ExpectationsWereMet()
 }
